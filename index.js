@@ -19,8 +19,9 @@ ZipSprite.prototype._extractFileList = function() {
 		var extraFieldLength = this._view.getUint16(index + 30, true);
 		var commentFieldLength = this._view.getUint16(index + 32, true);
 		var localFileHeaderOffset = this._view.getUint32(index + 42, true);
+		var fileName = String.fromCharCode.apply(String, new Uint8Array(this._buffer, index + 46, fileNameLength));
 
-		this._extractFileEntry(localFileHeaderOffset);
+		this._extractFileEntry(localFileHeaderOffset, fileName);
 
 		//Move to next file entry.
 		index = index + 46 + fileNameLength + extraFieldLength + commentFieldLength;
@@ -44,7 +45,7 @@ ZipSprite.prototype._findCentralDirStartOffset = function() {
 	return this._view.getUint32(endOfCentralDirSignatureIndex + 16, true);
 };
 
-ZipSprite.prototype._extractFileEntry = function(localFileHeaderOffset) {
+ZipSprite.prototype._extractFileEntry = function(localFileHeaderOffset, centralDirFileName) {
 	if(this._view.getUint32(localFileHeaderOffset, true) !== 0x04034b50) {
 		throw new Error('Expected local file header signature (0x04034b50)');
 	}
@@ -55,6 +56,11 @@ ZipSprite.prototype._extractFileEntry = function(localFileHeaderOffset) {
 	var extraFieldLength = view.getUint16(localFileHeaderOffset + 28, true);
 	var fileName = String.fromCharCode.apply(String, new Uint8Array(this._buffer, localFileHeaderOffset + 30, fileNameLength));
 	var fileDataOffset = localFileHeaderOffset + 30 + fileNameLength + extraFieldLength;
+
+	//The file name from the local file header does not match the name from the central dir.
+	if(fileName !== centralDirFileName) {
+		throw new Error('Invalid zip. The two file name entries "' + centralDirFileName + '" and "' + fileName + '" do not match.');
+	}
 
 	//Skip folders.
 	if(fileName.slice(-1) === '/') {

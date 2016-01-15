@@ -185,6 +185,7 @@ var zipFiles = [
 		]
 	},
 	{
+		throws: true,
 		name: 'slashes_and_izarc.zip',
 		files: [
 			{
@@ -221,22 +222,28 @@ var zipFiles = [
 ];
 
 //Test that the file list of every zip can be read (file name, offset from start and size).
-zipFiles.forEach(function(file) {
-	QUnit.test(file.name, function(assert) {
+zipFiles.forEach(function(testFile) {
+	QUnit.test(testFile.name, function(assert) {
 		var done = assert.async();
 		var options = {
-			url: 'zip/' + file.name,
+			url: 'zip/' + testFile.name,
 			method: 'GET',
 			responseType: 'arraybuffer'
 		};
 
 		xhr(options, function(err, response, buffer) {
-			var sprite = new ZipSprite(buffer);
-			assert.deepEqual(sprite.getFiles(), file.files);
+			if(testFile.throws) {
+				assert.throws(function() {
+					new ZipSprite(buffer);
+				});
+			} else {
+				var sprite = new ZipSprite(buffer);
+				assert.deepEqual(sprite.getFiles(), testFile.files);
 
-			//Test if we can get a filtered list of files, e.g. subfolders.
-			if(file.filtered) {
-				assert.deepEqual(sprite.getFiles(file.filtered.filter), file.filtered.files);
+				//Test if we can get a filtered list of files, e.g. subfolders.
+				if(testFile.filtered) {
+					assert.deepEqual(sprite.getFiles(testFile.filtered.filter), testFile.filtered.files);
+				}
 			}
 
 			done();
