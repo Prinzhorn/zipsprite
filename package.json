@@ -4,7 +4,9 @@
   "description": "Reduce HTTP requests by packing binary assets into a zip and accessing them via Blob URLs directly from memory",
   "main": "index.js",
   "scripts": {
-    "test": "browserify test/tests.js -o test/bundle.js && http-server test -o"
+    "test": "npm run lint && npm run qunit",
+    "lint": "eslint index.js test/tests.js",
+    "qunit": "browserify test/tests.js -o test/bundle.js && http-server test -o"
   },
   "keywords": [
     "zip",

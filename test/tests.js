@@ -1,5 +1,5 @@
 var xhr = require('xhr');
-var minimatch = require("minimatch")
+var minimatch = require('minimatch');
 
 var ZipSprite = require('../');
 
@@ -294,5 +294,7 @@ QUnit.test('createURL/revokeURL', function(assert) {
 
 		//We get a new URL.
 		assert.notEqual(sprite.createURL('smile.gif'), url);
+
+		done();
 	});
 });
