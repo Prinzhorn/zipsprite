@@ -19,5 +19,8 @@
   "devDependencies": {
     "http-server": "0.8.5",
     "xhr": "2.2.0"
+  },
+  "dependencies": {
+    "create-object-url": "1.0.2"
   }
 }

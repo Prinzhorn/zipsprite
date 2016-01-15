@@ -1,4 +1,82 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+var createObjectURL = require('create-object-url');
+
+var ZipSprite = function(buffer) {
+	var view = new DataView(buffer);
+	var endOfCentralDirSignatureIndex;
+	var centralDirStartOffset;
+	var index;
+	var files = [];
+
+	//Walk backwards and find the end of central dir signature.
+	for(endOfCentralDirSignatureIndex = view.byteLength - 5; endOfCentralDirSignatureIndex >= 0; endOfCentralDirSignatureIndex--) {
+		if(view.getUint32(endOfCentralDirSignatureIndex, true) === 0x06054b50) {
+			break;
+		}
+	}
+
+	if(endOfCentralDirSignatureIndex === -1) {
+		throw new Error('Could not find end of central directory signature (0x06054b50)');
+		return;
+	}
+
+	centralDirStartOffset = view.getUint32(endOfCentralDirSignatureIndex + 16, true);
+
+	index = centralDirStartOffset;
+
+	//Now we know where the central dir starts. List all filenames.
+	while(view.getUint32(index, true) === 0x02014b50) {
+		var compressedSize = view.getUint32(index + 20, true);
+		var uncompressedSize = view.getUint32(index + 24, true);
+		var fileNameLength = view.getUint16(index + 28, true);
+		var extraFieldLength = view.getUint16(index + 30, true);
+		var commentFieldLength = view.getUint16(index + 32, true);
+		var localFileHeaderOffset = view.getUint32(index + 42, true);
+		var fileName = String.fromCharCode.apply(String, new Uint8Array(buffer, index + 46, fileNameLength));
+
+		//Move to next file entry.
+		index = index + 46 + fileNameLength + extraFieldLength + commentFieldLength;
+
+		//Skip folders.
+		if(fileName.slice(-1) === '/') {
+			continue;
+		}
+
+		files.push({
+			name: fileName,
+			//offset: localFileHeaderOffset,
+			size: compressedSize
+		});
+	}
+
+	//TODO: 37 is a magic number and only works when filename is 7 (like 001.jpg) and "extra field" is 0 bytes.
+	/*
+	var view = new Uint8Array(buffer, files[0].offset + 37, files[0].size);
+	var blob = new Blob([view]);
+	var image = document.createElement('img');
+	image.src = createObjectURL(blob);
+	document.body.appendChild(image);
+	*/
+
+	this.files = files;
+};
+
+module.exports = ZipSprite;
+},{"create-object-url":2}],2:[function(require,module,exports){
+var createObjectURL;
+
+if(self.URL) {
+	createObjectURL = URL.createObjectURL.bind(URL);
+} else if(self.webkitURL) {
+	createObjectURL = webkitURL.createObjectURL.bind(webkitURL);
+} else {
+	createObjectURL = function() {
+		return '';
+	};
+}
+
+module.exports = createObjectURL;
+},{}],3:[function(require,module,exports){
 var isFunction = require('is-function')
 
 module.exports = forEach
@@ -46,7 +124,7 @@ function forEachObject(object, iterator, context) {
     }
 }
 
-},{"is-function":3}],2:[function(require,module,exports){
+},{"is-function":5}],4:[function(require,module,exports){
 (function (global){
 if (typeof window !== "undefined") {
     module.exports = window;
@@ -59,7 +137,7 @@ if (typeof window !== "undefined") {
 }
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],3:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
 module.exports = isFunction
 
 var toString = Object.prototype.toString
@@ -76,7 +154,7 @@ function isFunction (fn) {
       fn === window.prompt))
 };
 
-},{}],4:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 var trim = require('trim')
   , forEach = require('for-each')
   , isArray = function(arg) {
@@ -108,7 +186,7 @@ module.exports = function (headers) {
 
   return result
 }
-},{"for-each":1,"trim":5}],5:[function(require,module,exports){
+},{"for-each":3,"trim":7}],7:[function(require,module,exports){
 
 exports = module.exports = trim;
 
@@ -124,7 +202,7 @@ exports.right = function(str){
   return str.replace(/\s*$/, '');
 };
 
-},{}],6:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 "use strict";
 var window = require("global/window")
 var once = require("once")
@@ -345,7 +423,7 @@ function _createXHR(options) {
 
 function noop() {}
 
-},{"global/window":2,"is-function":3,"once":7,"parse-headers":4,"xtend":8}],7:[function(require,module,exports){
+},{"global/window":4,"is-function":5,"once":9,"parse-headers":6,"xtend":10}],9:[function(require,module,exports){
 module.exports = once
 
 once.proto = once(function () {
@@ -366,7 +444,7 @@ function once (fn) {
   }
 }
 
-},{}],8:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 module.exports = extend
 
 var hasOwnProperty = Object.prototype.hasOwnProperty;
@@ -387,103 +465,187 @@ function extend() {
     return target
 }
 
-},{}],9:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 var xhr = require('xhr');
-//var ZipSprite = require('../');
+var ZipSprite = require('../');
 
 var zipFiles = [
 	{
 		size: 367,
-		name: 'all.7zip.zip'
+		name: 'all.7zip.zip',
+		files: [
+			{
+				name: 'Hello.txt',
+				size: 12
+			},
+			{
+				name: 'images/smile.gif',
+				size: 41
+			}
+		]
 	},
 	{
 		size: 273,
-		name: 'all.windows.zip'
+		name: 'all.windows.zip',
+		files: [
+			{
+				name: 'Hello.txt',
+				size: 12
+			},
+			{
+				name: 'images/smile.gif',
+				size: 37
+			}
+		]
 	},
 	{
 		size: 367,
-		name: 'all.zip'
+		name: 'all.zip',
+		files: [
+			{
+				name: 'Hello.txt',
+				size: 12
+			},
+			{
+				name: 'images/smile.gif',
+				size: 41
+			}
+		]
 	},
 	{
 		size: 153,
-		name: 'archive_comment.zip'
+		name: 'archive_comment.zip',
+		files: [
+			{
+				name: 'Hello.txt',
+				size: 12
+			}
+		]
 	},
 	{
 		size: 130,
-		name: 'backslash.zip'
+		name: 'backslash.zip',
+		files: [
+			{
+				name: 'Hel\\lo.txt',
+				size: 12
+			}
+		]
 	},
 	{
 		size: 196,
-		name: 'data_descriptor.zip'
+		name: 'data_descriptor.zip',
+		files: [
+			{
+				name: 'Hello.txt',
+				size: 12
+			}
+		]
 	},
 	{
 		size: 189,
-		name: 'deflate.zip'
+		name: 'deflate.zip',
+		files: [
+			{
+				name: 'Hello.txt',
+				size: 73
+			}
+		]
 	},
 	{
 		size: 156,
-		name: 'encrypted.zip'
+		name: 'encrypted.zip',
+		files: [
+			{
+				name: 'Hello.txt',
+				size: 24
+			}
+		]
 	},
 	{
 		size: 180,
-		name: 'extra_attributes.zip'
+		name: 'extra_attributes.zip',
+		files: [
+			{
+				name: 'Hello.txt',
+				size: 12
+			}
+		]
 	},
 	{
 		size: 112,
-		name: 'folder.zip'
+		name: 'folder.zip',
+		files: []
 	},
 	{
 		size: 157,
-		name: 'image.zip'
+		name: 'image.zip',
+		files: [
+			{
+				name: 'smile.gif',
+				size: 41
+			}
+		]
 	},
 	{
 		size: 400,
-		name: 'nested_data_descriptor.zip'
+		name: 'nested_data_descriptor.zip',
+		files: [
+			{
+				name: 'data_descriptor.zip',
+				size: 196
+			}
+		]
 	},
 	{
 		size: 368,
-		name: 'nested.zip'
-	},
-	{
-		size: 564,
-		name: 'nested_zip64.zip'
-	},
-	{
-		size: 209,
-		name: 'pile_of_poo.zip'
+		name: 'nested.zip',
+		files: [
+			{
+				name: 'Hello.txt',
+				size: 12
+			},
+			{
+				name: 'zip_within_zip.zip',
+				size: 128
+			}
+		]
 	},
 	{
 		size: 139,
-		name: 'slashes_and_izarc.zip'
+		name: 'slashes_and_izarc.zip',
+		files: [
+			{
+				name: 'test\\Hello.txt',
+				size: 13
+			}
+		]
 	},
 	{
 		size: 210,
-		name: 'store.zip'
+		name: 'store.zip',
+		files: [
+			{
+				name: 'Hello.txt',
+				size: 94
+			}
+		]
 	},
 	{
 		size: 222,
-		name: 'subfolder.zip'
+		name: 'subfolder.zip',
+		files: []
 	},
 	{
 		size: 128,
-		name: 'text.zip'
-	},
-	{
-		size: 122,
-		name: 'utf8_in_name.zip'
-	},
-	{
-		size: 124,
-		name: 'utf8.zip'
-	},
-	{
-		size: 154,
-		name: 'winrar_utf8_in_name.zip'
-	},
-	{
-		size: 288,
-		name: 'zip64.zip'
-	},
+		name: 'text.zip',
+		files: [
+			{
+				name: 'Hello.txt',
+				size: 12
+			}
+		]
+	}
 ];
 
 zipFiles.forEach(function(file) {
@@ -496,9 +658,12 @@ zipFiles.forEach(function(file) {
 		};
 
 		xhr(options, function(err, response, buffer) {
+			var sprite = new ZipSprite(buffer);
 			assert.equal(buffer.byteLength, file.size);
+			assert.deepEqual(sprite.files, file.files);
+
 			done();
 		});
 	});
 });
-},{"xhr":6}]},{},[9]);
+},{"../":1,"xhr":8}]},{},[11]);
