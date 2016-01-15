@@ -6,9 +6,6 @@
   "scripts": {
     "test": "browserify test/tests.js -o test/bundle.js && http-server test -o"
   },
-  "testling": {
-    "files": "test/tests.js"
-  },
   "keywords": [
     "zip",
     "sprite",
