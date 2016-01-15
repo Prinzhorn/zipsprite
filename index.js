@@ -7,6 +7,7 @@ var ZipSprite = function(buffer) {
 	this._view = new DataView(this._buffer);
 	this._files = [];
 	this._filesByName = {};
+	this._URLCache = {};
 
 	this._extractFileList();
 };
@@ -92,22 +93,34 @@ ZipSprite.prototype.getFiles = function(filterFunction) {
 };
 
 ZipSprite.prototype.createURL = function(fileName) {
-	var file = this._filesByName[fileName];
+	var cachedURL = this._URLCache[fileName];
+	var file;
 	var view;
 	var blob;
+
+	if(cachedURL) {
+		return cachedURL;
+	}
+
+	file = this._filesByName[fileName];
 
 	if(!file) {
 		throw new Error('The zip does not contain ' + fileName);
 	}
 
+	//We're using Uint8Array instead of DataView because IE.
+	//https://gist.github.com/Prinzhorn/5a9d7db4e4fb9372b2e6
 	view = new Uint8Array(this._buffer, file.offset, file.size);
 	blob = new Blob([view]);
 
-	return createObjectURL(blob);
+	cachedURL = this._URLCache[fileName] = createObjectURL(blob);
+
+	return cachedURL;
 };
 
-ZipSprite.prototype.revokeURL = function(url) {
-	revokeObjectURL(url);
+ZipSprite.prototype.revokeURL = function(fileName) {
+	revokeObjectURL(this._URLCache[fileName]);
+	delete this._URLCache[fileName];
 };
 
 module.exports = ZipSprite;

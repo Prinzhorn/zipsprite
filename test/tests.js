@@ -262,15 +262,37 @@ QUnit.test('Load image', function(assert) {
 		image.onload = function() {
 			assert.equal(image.width, 5);
 			assert.equal(image.height, 5);
-			sprite.revokeURL(image.src);
 			done();
 		};
 
 		image.onerror = function() {
-			sprite.revokeURL(image.src);
 			assert.notOk(true, 'Image onerror fired');
 		};
 
 		image.src = sprite.createURL('smile.gif');
+	});
+});
+
+//Make sure we get the same URL for multiple calls unless we revoke it.
+QUnit.test('createURL/revokeURL', function(assert) {
+	var done = assert.async();
+
+	var options = {
+		url: 'zip/image.zip',
+		method: 'GET',
+		responseType: 'arraybuffer'
+	};
+
+	xhr(options, function(err, response, buffer) {
+		var sprite = new ZipSprite(buffer);
+		var url = sprite.createURL('smile.gif');
+
+		//We get the same URL again.
+		assert.equal(sprite.createURL('smile.gif'), url);
+
+		sprite.revokeURL('smile.gif');
+
+		//We get a new URL.
+		assert.notEqual(sprite.createURL('smile.gif'), url);
 	});
 });
