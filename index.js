@@ -58,6 +58,7 @@ ZipSprite.prototype._extractFileEntry = function(localFileHeaderOffset, centralD
 	var fileDataOffset = localFileHeaderOffset + 30 + fileNameLength + extraFieldLength;
 
 	//The file name from the local file header does not match the name from the central dir.
+	//https://github.com/Stuk/jszip/issues/251
 	if(fileName !== centralDirFileName) {
 		throw new Error('Invalid zip. The two file name entries "' + centralDirFileName + '" and "' + fileName + '" do not match.');
 	}
