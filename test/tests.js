@@ -1,5 +1,13 @@
 var xhr = require('xhr');
+var minimatch = require("minimatch")
+
 var ZipSprite = require('../');
+
+var globFilter = function(pattern) {
+	return function(path) {
+		return minimatch(path, pattern);
+	};
+};
 
 var zipFiles = [
 	{
@@ -15,7 +23,7 @@ var zipFiles = [
 			}
 		],
 		filtered: {
-			filter: /^images\//,
+			filter: globFilter('images/*'),
 			files: [
 				{
 					name: 'images/smile.gif',
@@ -37,7 +45,7 @@ var zipFiles = [
 			}
 		],
 		filtered: {
-			filter: /^[^/]+$/,
+			filter: globFilter('*'),
 			files: [
 				{
 					name: 'Hello.txt',
@@ -59,7 +67,7 @@ var zipFiles = [
 			}
 		],
 		filtered: {
-			filter: /\.txt$/,
+			filter: globFilter('*.txt'),
 			files: [
 				{
 					name: 'Hello.txt',
@@ -204,6 +212,7 @@ zipFiles.forEach(function(file) {
 			var sprite = new ZipSprite(buffer);
 			assert.deepEqual(sprite.getFiles(), file.files);
 
+			//Test if we can get a filtered list of files, e.g. subfolders.
 			if(file.filtered) {
 				assert.deepEqual(sprite.getFiles(file.filtered.filter), file.filtered.files);
 			}

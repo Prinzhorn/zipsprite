@@ -70,13 +70,13 @@ var ZipSprite = function(buffer) {
 	this._filesByName = filesByName;
 };
 
-ZipSprite.prototype.getFiles = function(filterExpression) {
-	if(!filterExpression) {
+ZipSprite.prototype.getFiles = function(filterFunction) {
+	if(!filterFunction) {
 		return this._files.slice(0);
 	}
 
 	return this._files.filter(function(file) {
-		return filterExpression.test(file.name);
+		return filterFunction(file.name);
 	});
 };
 

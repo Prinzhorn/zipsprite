@@ -18,6 +18,7 @@
   "license": "MIT",
   "devDependencies": {
     "http-server": "0.8.5",
+    "minimatch": "3.0.0",
     "xhr": "2.2.0"
   },
   "dependencies": {
