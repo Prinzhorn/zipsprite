@@ -15,11 +15,13 @@ var zipFiles = [
 		files: [
 			{
 				name: 'Hello.txt',
-				size: 12
+				size: 12,
+				offset: 39
 			},
 			{
 				name: 'images/smile.gif',
-				size: 41
+				size: 41,
+				offset: 134
 			}
 		],
 		filtered: {
@@ -27,7 +29,8 @@ var zipFiles = [
 			files: [
 				{
 					name: 'images/smile.gif',
-					size: 41
+					size: 41,
+					offset: 134
 				}
 			]
 		}
@@ -37,11 +40,13 @@ var zipFiles = [
 		files: [
 			{
 				name: 'Hello.txt',
-				size: 12
+				size: 12,
+				offset: 39
 			},
 			{
 				name: 'images/smile.gif',
-				size: 37
+				size: 37,
+				offset: 97
 			}
 		],
 		filtered: {
@@ -49,7 +54,8 @@ var zipFiles = [
 			files: [
 				{
 					name: 'Hello.txt',
-					size: 12
+					size: 12,
+					offset: 39
 				}
 			]
 		}
@@ -59,11 +65,13 @@ var zipFiles = [
 		files: [
 			{
 				name: 'Hello.txt',
-				size: 12
+				size: 12,
+				offset: 39
 			},
 			{
 				name: 'images/smile.gif',
-				size: 41
+				size: 41,
+				offset: 134
 			}
 		],
 		filtered: {
@@ -71,7 +79,8 @@ var zipFiles = [
 			files: [
 				{
 					name: 'Hello.txt',
-					size: 12
+					size: 12,
+					offset: 39
 				}
 			]
 		}
@@ -81,7 +90,8 @@ var zipFiles = [
 		files: [
 			{
 				name: 'Hello.txt',
-				size: 12
+				size: 12,
+				offset: 39
 			}
 		]
 	},
@@ -90,7 +100,8 @@ var zipFiles = [
 		files: [
 			{
 				name: 'Hel\\lo.txt',
-				size: 12
+				size: 12,
+				offset: 40
 			}
 		]
 	},
@@ -99,7 +110,8 @@ var zipFiles = [
 		files: [
 			{
 				name: 'Hello.txt',
-				size: 12
+				size: 12,
+				offset: 67
 			}
 		]
 	},
@@ -108,7 +120,8 @@ var zipFiles = [
 		files: [
 			{
 				name: 'Hello.txt',
-				size: 73
+				size: 73,
+				offset: 39
 			}
 		]
 	},
@@ -117,7 +130,8 @@ var zipFiles = [
 		files: [
 			{
 				name: 'Hello.txt',
-				size: 24
+				size: 24,
+				offset: 39
 			}
 		]
 	},
@@ -126,7 +140,8 @@ var zipFiles = [
 		files: [
 			{
 				name: 'Hello.txt',
-				size: 12
+				size: 12,
+				offset: 67
 			}
 		]
 	},
@@ -139,7 +154,8 @@ var zipFiles = [
 		files: [
 			{
 				name: 'smile.gif',
-				size: 41
+				size: 41,
+				offset: 39
 			}
 		]
 	},
@@ -148,7 +164,8 @@ var zipFiles = [
 		files: [
 			{
 				name: 'data_descriptor.zip',
-				size: 196
+				size: 196,
+				offset: 77
 			}
 		]
 	},
@@ -157,11 +174,13 @@ var zipFiles = [
 		files: [
 			{
 				name: 'Hello.txt',
-				size: 12
+				size: 12,
+				offset: 39
 			},
 			{
 				name: 'zip_within_zip.zip',
-				size: 128
+				size: 128,
+				offset: 99
 			}
 		]
 	},
@@ -169,8 +188,9 @@ var zipFiles = [
 		name: 'slashes_and_izarc.zip',
 		files: [
 			{
-				name: 'test\\Hello.txt',
-				size: 13
+				name: 'test/Hello.txt',
+				size: 13,
+				offset: 44
 			}
 		]
 	},
@@ -179,7 +199,8 @@ var zipFiles = [
 		files: [
 			{
 				name: 'Hello.txt',
-				size: 94
+				size: 94,
+				offset: 39
 			}
 		]
 	},
@@ -192,7 +213,8 @@ var zipFiles = [
 		files: [
 			{
 				name: 'Hello.txt',
-				size: 12
+				size: 12,
+				offset: 39
 			}
 		]
 	}
