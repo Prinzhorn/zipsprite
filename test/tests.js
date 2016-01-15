@@ -13,7 +13,16 @@ var zipFiles = [
 				name: 'images/smile.gif',
 				size: 41
 			}
-		]
+		],
+		filtered: {
+			filter: /^images\//,
+			files: [
+				{
+					name: 'images/smile.gif',
+					size: 41
+				}
+			]
+		}
 	},
 	{
 		name: 'all.windows.zip',
@@ -26,7 +35,16 @@ var zipFiles = [
 				name: 'images/smile.gif',
 				size: 37
 			}
-		]
+		],
+		filtered: {
+			filter: /^[^/]+$/,
+			files: [
+				{
+					name: 'Hello.txt',
+					size: 12
+				}
+			]
+		}
 	},
 	{
 		name: 'all.zip',
@@ -39,7 +57,16 @@ var zipFiles = [
 				name: 'images/smile.gif',
 				size: 41
 			}
-		]
+		],
+		filtered: {
+			filter: /\.txt$/,
+			files: [
+				{
+					name: 'Hello.txt',
+					size: 12
+				}
+			]
+		}
 	},
 	{
 		name: 'archive_comment.zip',
@@ -175,7 +202,11 @@ zipFiles.forEach(function(file) {
 
 		xhr(options, function(err, response, buffer) {
 			var sprite = new ZipSprite(buffer);
-			assert.deepEqual(sprite.files, file.files);
+			assert.deepEqual(sprite.getFiles(), file.files);
+
+			if(file.filtered) {
+				assert.deepEqual(sprite.getFiles(file.filtered.filter), file.filtered.files);
+			}
 
 			done();
 		});

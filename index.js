@@ -1,3 +1,4 @@
+var Blob = require('blob');
 var createObjectURL = require('create-object-url');
 
 var ZipSprite = function(buffer) {
@@ -65,8 +66,18 @@ var ZipSprite = function(buffer) {
 	document.body.appendChild(image);
 	*/
 
-	this.files = filesList;
+	this._files = filesList;
 	this._filesByName = filesByName;
+};
+
+ZipSprite.prototype.getFiles = function(filterExpression) {
+	if(!filterExpression) {
+		return this._files.slice(0);
+	}
+
+	return this._files.filter(function(file) {
+		return filterExpression.test(file.name);
+	});
 };
 
 ZipSprite.prototype.createURL = function(fileName) {

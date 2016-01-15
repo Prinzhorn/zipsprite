@@ -21,6 +21,7 @@
     "xhr": "2.2.0"
   },
   "dependencies": {
+    "blob": "0.0.4",
     "create-object-url": "1.0.2"
   }
 }
