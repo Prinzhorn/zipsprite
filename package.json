@@ -1,0 +1,23 @@
+{
+  "name": "zipsprite",
+  "version": "0.0.1",
+  "description": "Reduce HTTP requests by packing binary assets into a zip and accessing them via Blob URLs directly from memory",
+  "main": "index.js",
+  "scripts": {
+    "test": "browserify test/tests.js -o test/bundle.js && http-server test -o"
+  },
+  "testling": {
+    "files": "test/tests.js"
+  },
+  "keywords": [
+    "zip",
+    "sprite",
+    "performance"
+  ],
+  "author": "Alexander Prinzhorn",
+  "license": "MIT",
+  "devDependencies": {
+    "http-server": "0.8.5",
+    "xhr": "2.2.0"
+  }
+}
