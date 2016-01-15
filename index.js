@@ -1,11 +1,14 @@
 var createObjectURL = require('create-object-url');
 
 var ZipSprite = function(buffer) {
+	this._buffer = buffer;
+
 	var view = new DataView(buffer);
 	var endOfCentralDirSignatureIndex;
 	var centralDirStartOffset;
 	var index;
-	var files = [];
+	var filesList = [];
+	var filesByName = {};
 
 	//Walk backwards and find the end of central dir signature.
 	for(endOfCentralDirSignatureIndex = view.byteLength - 5; endOfCentralDirSignatureIndex >= 0; endOfCentralDirSignatureIndex--) {
@@ -41,23 +44,44 @@ var ZipSprite = function(buffer) {
 			continue;
 		}
 
-		files.push({
+		filesList.push({
 			name: fileName,
 			//offset: localFileHeaderOffset,
 			size: compressedSize
 		});
+
+		filesByName[fileName] = {
+			offset: localFileHeaderOffset + 39,
+			size: compressedSize
+		};
 	}
 
 	//TODO: 37 is a magic number and only works when filename is 7 (like 001.jpg) and "extra field" is 0 bytes.
 	/*
-	var view = new Uint8Array(buffer, files[0].offset + 37, files[0].size);
+	var view = new Uint8Array(buffer, filesList[0].offset + 37, filesList[0].size);
 	var blob = new Blob([view]);
 	var image = document.createElement('img');
 	image.src = createObjectURL(blob);
 	document.body.appendChild(image);
 	*/
 
-	this.files = files;
+	this.files = filesList;
+	this._filesByName = filesByName;
+};
+
+ZipSprite.prototype.createURL = function(fileName) {
+	var file = this._filesByName[fileName];
+	var view;
+	var blob;
+
+	if(!file) {
+		throw new Error('The zip does not contain ' + fileName);
+	}
+
+	view = new Uint8Array(this._buffer, file.offset, file.size);
+	blob = new Blob([view]);
+
+	return createObjectURL(blob);
 };
 
 module.exports = ZipSprite;

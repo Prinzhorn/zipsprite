@@ -3,7 +3,6 @@ var ZipSprite = require('../');
 
 var zipFiles = [
 	{
-		size: 367,
 		name: 'all.7zip.zip',
 		files: [
 			{
@@ -17,7 +16,6 @@ var zipFiles = [
 		]
 	},
 	{
-		size: 273,
 		name: 'all.windows.zip',
 		files: [
 			{
@@ -31,7 +29,6 @@ var zipFiles = [
 		]
 	},
 	{
-		size: 367,
 		name: 'all.zip',
 		files: [
 			{
@@ -45,7 +42,6 @@ var zipFiles = [
 		]
 	},
 	{
-		size: 153,
 		name: 'archive_comment.zip',
 		files: [
 			{
@@ -55,7 +51,6 @@ var zipFiles = [
 		]
 	},
 	{
-		size: 130,
 		name: 'backslash.zip',
 		files: [
 			{
@@ -65,7 +60,6 @@ var zipFiles = [
 		]
 	},
 	{
-		size: 196,
 		name: 'data_descriptor.zip',
 		files: [
 			{
@@ -75,7 +69,6 @@ var zipFiles = [
 		]
 	},
 	{
-		size: 189,
 		name: 'deflate.zip',
 		files: [
 			{
@@ -85,7 +78,6 @@ var zipFiles = [
 		]
 	},
 	{
-		size: 156,
 		name: 'encrypted.zip',
 		files: [
 			{
@@ -95,7 +87,6 @@ var zipFiles = [
 		]
 	},
 	{
-		size: 180,
 		name: 'extra_attributes.zip',
 		files: [
 			{
@@ -105,12 +96,10 @@ var zipFiles = [
 		]
 	},
 	{
-		size: 112,
 		name: 'folder.zip',
 		files: []
 	},
 	{
-		size: 157,
 		name: 'image.zip',
 		files: [
 			{
@@ -120,7 +109,6 @@ var zipFiles = [
 		]
 	},
 	{
-		size: 400,
 		name: 'nested_data_descriptor.zip',
 		files: [
 			{
@@ -130,7 +118,6 @@ var zipFiles = [
 		]
 	},
 	{
-		size: 368,
 		name: 'nested.zip',
 		files: [
 			{
@@ -144,7 +131,6 @@ var zipFiles = [
 		]
 	},
 	{
-		size: 139,
 		name: 'slashes_and_izarc.zip',
 		files: [
 			{
@@ -154,7 +140,6 @@ var zipFiles = [
 		]
 	},
 	{
-		size: 210,
 		name: 'store.zip',
 		files: [
 			{
@@ -164,12 +149,10 @@ var zipFiles = [
 		]
 	},
 	{
-		size: 222,
 		name: 'subfolder.zip',
 		files: []
 	},
 	{
-		size: 128,
 		name: 'text.zip',
 		files: [
 			{
@@ -180,6 +163,7 @@ var zipFiles = [
 	}
 ];
 
+//Test that the file list of every zip can be read (file name, offset from start and size).
 zipFiles.forEach(function(file) {
 	QUnit.test(file.name, function(assert) {
 		var done = assert.async();
@@ -191,10 +175,37 @@ zipFiles.forEach(function(file) {
 
 		xhr(options, function(err, response, buffer) {
 			var sprite = new ZipSprite(buffer);
-			assert.equal(buffer.byteLength, file.size);
 			assert.deepEqual(sprite.files, file.files);
 
 			done();
 		});
+	});
+});
+
+//Make sure loading an image form inside of a zip using Blob URLs actually works.
+QUnit.test('Load image', function(assert) {
+	var done = assert.async();
+
+	var options = {
+		url: 'zip/image.zip',
+		method: 'GET',
+		responseType: 'arraybuffer'
+	};
+
+	xhr(options, function(err, response, buffer) {
+		var sprite = new ZipSprite(buffer);
+		var image = new Image();
+
+		image.onload = function() {
+			assert.equal(image.width, 5);
+			assert.equal(image.height, 5);
+			done();
+		};
+
+		image.onerror = function() {
+			assert.notOk(true, 'Image onerror fired');
+		};
+
+		image.src = sprite.createURL('smile.gif');
 	});
 });
