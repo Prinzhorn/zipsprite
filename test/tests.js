@@ -3,12 +3,6 @@ var minimatch = require("minimatch")
 
 var ZipSprite = require('../');
 
-var globFilter = function(pattern) {
-	return function(path) {
-		return minimatch(path, pattern);
-	};
-};
-
 var zipFiles = [
 	{
 		name: 'all.7zip.zip',
@@ -25,7 +19,7 @@ var zipFiles = [
 			}
 		],
 		filtered: {
-			filter: globFilter('images/*'),
+			filter: minimatch.filter('images/*'),
 			files: [
 				{
 					name: 'images/smile.gif',
@@ -50,7 +44,7 @@ var zipFiles = [
 			}
 		],
 		filtered: {
-			filter: globFilter('*'),
+			filter: minimatch.filter('*'),
 			files: [
 				{
 					name: 'Hello.txt',
@@ -75,7 +69,7 @@ var zipFiles = [
 			}
 		],
 		filtered: {
-			filter: globFilter('*.txt'),
+			filter: minimatch.filter('*.txt'),
 			files: [
 				{
 					name: 'Hello.txt',
@@ -268,10 +262,12 @@ QUnit.test('Load image', function(assert) {
 		image.onload = function() {
 			assert.equal(image.width, 5);
 			assert.equal(image.height, 5);
+			sprite.revokeURL(image.src);
 			done();
 		};
 
 		image.onerror = function() {
+			sprite.revokeURL(image.src);
 			assert.notOk(true, 'Image onerror fired');
 		};
 

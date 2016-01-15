@@ -1,5 +1,6 @@
 var Blob = require('blob');
 var createObjectURL = require('create-object-url');
+var revokeObjectURL = require('revoke-object-url');
 
 var ZipSprite = function(buffer) {
 	this._buffer = buffer;
@@ -103,6 +104,10 @@ ZipSprite.prototype.createURL = function(fileName) {
 	blob = new Blob([view]);
 
 	return createObjectURL(blob);
+};
+
+ZipSprite.prototype.revokeURL = function(url) {
+	revokeObjectURL(url);
 };
 
 module.exports = ZipSprite;

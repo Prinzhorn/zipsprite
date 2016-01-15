@@ -11,7 +11,7 @@
     "sprite",
     "performance"
   ],
-  "author": "Alexander Prinzhorn",
+  "author": "Alexander Prinzhorn <alexander@prinzhorn.it>",
   "license": "MIT",
   "devDependencies": {
     "http-server": "0.8.5",
@@ -20,6 +20,7 @@
   },
   "dependencies": {
     "blob": "0.0.4",
-    "create-object-url": "1.0.2"
+    "create-object-url": "1.0.2",
+    "revoke-object-url": "1.0.2"
   }
 }
