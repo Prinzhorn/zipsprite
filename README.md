@@ -11,7 +11,7 @@ Since the zip files are uncompressed (compression is already done by the image/a
 
 
 How to use
-----------
+==========
 
 First you need to get the zip file into memory as `ArrayBuffer`. This is out of scope of ZipSprite, but you could for example load it via xhr with `responseType` set to `arraybuffer`. Then construct a new ZipStream instance and get a URL to the file you want!
 
@@ -49,3 +49,23 @@ After you've used the URL (you've displayed the image, loaded the model or playe
 ```js
 sprite.revokeURL('images/mind-blown.gif');
 ```
+
+
+How to create compatible zip files
+==================================
+
+Examples using different CLIs to pack all jpg files into archive.zip
+
+```
+zip -Z store archive.zip *.jpg
+
+7z a -tzip archive.zip *.jpg -mx0
+```
+
+Changelog
+=========
+
+1.0.1
+-----
+
+* Use `application/octet-stream` as mime type when creating the Blob. Otherwise it is served as `text/plain`. This may cause problems for binary data. Images will now correctly preview in the "network" tab of the dev tools.

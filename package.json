@@ -1,8 +1,16 @@
 {
   "name": "zipsprite",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Reduce HTTP requests by packing binary assets into a zip and accessing them via Blob URLs directly from memory",
   "main": "index.js",
+  "homepage": "https://github.com/Prinzhorn/zipsprite",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/Prinzhorn/zipsprite.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Prinzhorn/zipsprite/issues"
+  },
   "scripts": {
     "test": "npm run lint && npm run qunit",
     "lint": "eslint index.js test/tests.js",
