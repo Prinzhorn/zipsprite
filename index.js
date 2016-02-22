@@ -111,7 +111,7 @@ ZipSprite.prototype.createURL = function(fileName) {
 	//We're using Uint8Array instead of DataView because IE.
 	//https://gist.github.com/Prinzhorn/5a9d7db4e4fb9372b2e6
 	view = new Uint8Array(this._buffer, file.offset, file.size);
-	blob = new Blob([view]);
+	blob = new Blob([view], {type: 'application/octet-stream'});
 
 	cachedURL = this._URLCache[fileName] = createObjectURL(blob);
 
