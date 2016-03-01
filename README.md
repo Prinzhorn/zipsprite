@@ -1,6 +1,8 @@
 ZipSprite
 =========
 
+ZipSprite is currently only available as a CommonJS module to use with Browserify.
+
 `npm install zipsprite`
 
 ZipSprite is a general purpose library to use uncompressed zip files as a container format in the browser. ZipSprite can be used to reduce HTTP requests whether you're creating a game, a multimedia interactive or an app.
@@ -54,7 +56,8 @@ sprite.revokeURL('images/mind-blown.gif');
 How to create compatible zip files
 ==================================
 
-Examples using different CLIs to pack all jpg files into archive.zip
+Using different CLIs to pack all jpg files into archive.zip
+-----------------------------------------------------------
 
 ```
 zip -Z store archive.zip *.jpg
@@ -62,8 +65,57 @@ zip -Z store archive.zip *.jpg
 7z a -tzip archive.zip *.jpg -mx0
 ```
 
+Dynamically generate a zip and stream it to the user in node (example uses express)
+-----------------------------------------------------------------------------------
+
+Useful if you need per user ZipSprites or based on request params.
+
+```js
+var fs = require('fs');
+var express = require('express');
+var archiver = require('archiver');
+
+var app = express();
+
+app.get('/zip', function(req, res, next) {
+	var archive = archiver.create('zip', {
+		//This is the important bit.
+		store: true
+	});
+
+	archive.pipe(res);
+
+	archive.append(fs.createReadStream('./photo.jpg'), {
+		name: 'photo.jpg',
+		prefix: 'images/'
+	});
+
+	archive.append(fs.createReadStream('./boom.wav'), {
+		name: 'boom.wav',
+		prefix: 'audio/'
+	});
+
+	archive.finalize();
+});
+
+app.listen(8080);
+```
+
+On the client you'll access the files like this
+
+```js
+image.src = sprite.createURL('images/photo.jpg');
+audioPlayer.src = sprite.createURL('audio/boom.wav');
+```
+
+
 Changelog
 =========
+
+1.0.2
+-----
+
+* Version bump to push new README to npm
 
 1.0.1
 -----
